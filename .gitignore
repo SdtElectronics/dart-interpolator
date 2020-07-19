@@ -1,0 +1,6 @@
+/lib/src/vscode.code-workspace
+.dart_tool/
+.packages
+build/
+pubspec.lock
+doc/api/
