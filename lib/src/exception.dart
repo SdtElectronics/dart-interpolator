@@ -5,5 +5,5 @@ List<int> _locateStr(String str, Pattern pattern){
 
 String formatLocation(String str, Pattern pattern){
 	final location = _locateStr(str, pattern);
-	return "${location[0]}:${location[1]}";
+	return "${location[0]}:${location[1] + 1}";
 }

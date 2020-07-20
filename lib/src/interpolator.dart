@@ -8,7 +8,9 @@ class Interpolator{
 	final String placeholder;
 	final List<String> _bodySegs;
 	final List<String> _subs;
-	get subs {
+
+	///Get interpolation keys
+	get keys {
 		List<String> ret = List.from(_subs);
 		while(ret.remove("pre"));
 		while(ret.remove("suf"));
@@ -47,12 +49,9 @@ class Interpolator{
 			
 			//If the '}' matching the previous '{' is missing, throw an Exception
 			if(segPair[0].length == segPairStr.length){
-				if(segPairStr.length == 0){
-					throw FormatException("Expected '$_suffix' to match '$_prefix' "
-									  "at the end");
-				}
 				throw FormatException("Expected '$_suffix' to match '$_prefix' at "
-									  "${formatLocation(format, '$segPairStr{')}");
+									  "${formatLocation(segPairStr == segments.last?
+									  	'{$format{' : format, '{$segPairStr{')}");
 			}
 
 			//Add the interpolation to subs
@@ -73,17 +72,19 @@ class Interpolator{
 		subCopy["suf"] = _suffix;
 
 		String ret = "";
-		int index = 0;
 
 		//Assemble the result string from segments and substitutions
+		int index = 0;
 		for(final unsub in _subs){
 			ret += _bodySegs[index++];
 			ret += (subCopy[unsub] ?? 
-					   (placeholder ?? 
-							(throw FormatException("No match with key \"$unsub\" at " 
+					    (placeholder ?? 
+							(
+								throw FormatException("No match with key \"$unsub\" at " 
 												   "${formatLocation(format, 
 												   					 RegExp(unsub))} "
-								   					"and no placeholder specified"))
+								   					"and no placeholder specified")
+							)
 						)
 					);
 		}

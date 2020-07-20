@@ -41,23 +41,20 @@ void main() {
 
 		test("Get interpolation List", () {
       		final interpolator = Interpolator(format);
-      		expect(interpolator.subs,
+      		expect(interpolator.keys,
 			  	   equals(subs_full.entries.map((e) => e.key.toString()).toList()));
     	});
  	});
 
 	group('Syntax Error Check:', () {
-
 		test("Exception handling on format String with "
 			 "unmatched '{'", () {
 
 			try{
-				Interpolator("Unmatched '{pre}' at 2:2\n {");
+				Interpolator("Unmatched '{pre}' at 2:2\n { ");
 			}on FormatException catch(e){
-				expect(e.message, "Expected '}' to match '{' at the end");
-			}
-
-			
+				expect(e.message, "Expected '}' to match '{' at 2:2");
+			}	
     	});
 
 		test("Exception handling on format String with null "
@@ -69,7 +66,7 @@ void main() {
 				interpolator(const{});
 			}on FormatException catch(e){
 				expect(e.message, "No match with key "
-				  				  "\"nullMatch\" at 1:1 and "
+				  				  "\"nullMatch\" at 1:2 and "
 								  "no placeholder specified");
 			}
 													   
