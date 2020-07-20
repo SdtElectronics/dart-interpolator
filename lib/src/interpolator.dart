@@ -8,17 +8,23 @@ class Interpolator{
 	final String placeholder;
 	final List<String> _bodySegs;
 	final List<String> _subs;
-	get subs => _subs;
+	get subs {
+		List<String> ret = List.from(_subs);
+		while(ret.remove("pre"));
+		while(ret.remove("suf"));
+		return ret;
+	}
+
 	///Get input format string
 	get format{
-		List<String> bodyCopy = List.from(_bodySegs);
+		List<String> ret = [_bodySegs[0]];
 
 		int index = 0;
 		for(final sub in _subs){
-			bodyCopy.insert(++index, "{$sub}");
+			ret.addAll(["{${sub}}", _bodySegs[++index]]);
 		}
 
-		return bodyCopy.join();
+		return ret.join();
 	}
 
 	Interpolator._(this._bodySegs, this._subs, this.placeholder);
@@ -38,11 +44,15 @@ class Interpolator{
 		for(final segPairStr in segments.sublist(1)){
 			//A segPair is like [interpolation] } [trailing string]
 			final segPair = segPairStr.split(_suffix);
-
+			
 			//If the '}' matching the previous '{' is missing, throw an Exception
 			if(segPair[0].length == segPairStr.length){
+				if(segPairStr.length == 0){
+					throw FormatException("Expected '$_suffix' to match '$_prefix' "
+									  "at the end");
+				}
 				throw FormatException("Expected '$_suffix' to match '$_prefix' at "
-									  "${formatLocation(format, RegExp(segPair[0]))}");
+									  "${formatLocation(format, '$segPairStr{')}");
 			}
 
 			//Add the interpolation to subs
