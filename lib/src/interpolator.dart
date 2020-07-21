@@ -18,7 +18,7 @@ class Interpolator{
 	}
 
 	///Get input format string
-	get format{
+	get format {
 		List<String> ret = [_bodySegs[0]];
 
 		int index = 0;
@@ -64,9 +64,15 @@ class Interpolator{
 		return Interpolator._(bodySegs, subs, placeholder);
 	}
 
-	String call(Map<String, String> sub) {
-		//Make a copy since sub need to be modified
-		var subCopy = Map.from(sub);
+	String call<V>(Map<String, V> sub) {
+		//Cast if necessary and make a copy since sub need to be modified 
+		Map<String, String> subCopy;
+		if(V is String){
+			subCopy = Map.from(sub);
+		}else{
+			subCopy = sub.map((key, val) => MapEntry(key, val.toString()));
+		}
+
 		//Escape the brackets
 		subCopy["pre"] = _prefix;
 		subCopy["suf"] = _suffix;

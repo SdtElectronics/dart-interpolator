@@ -5,16 +5,17 @@ void main() {
   	group("String Interpolation:", () {
     	const format = "{Part Name} CMOS Micropower {Type} {pre}{Abbr}{suf}"
 					   "consists of a low power linear voltage-controlled"
-					   "oscillator (VCO) and two different {Component}";
+					   "oscillator (VCO) and {Count} different {Component}";
 		const result = "CD4046 CMOS Micropower Phase-Locked Loop {PLL}"
 					   "consists of a low power linear voltage-controlled"
-					   "oscillator (VCO) and two different phase comparators";
+					   "oscillator (VCO) and 2 different phase comparators";
 		const subs_full = {
-				"Part Name": "CD4046",
-				"Type":		 "Phase-Locked Loop",
-				"Abbr":		 "PLL",
-				"Component": "phase comparators"
-				};
+			"Part Name": "CD4046",
+			"Type":		 "Phase-Locked Loop",
+			"Abbr":		 "PLL",
+			"Count":	 2,
+			"Component": "phase comparators"
+		};
 
 		test("Interpolation on format String with full "
 			 "match and no placeholder provided", () {
@@ -24,10 +25,11 @@ void main() {
 
 		test("Interpolation on format String with null "
 			 "match and a placeholder provided", () {
-      		final interpolator = Interpolator(format, placeholder: "PLL");
+      		final interpolator = Interpolator(format, placeholder: "2");
 			const subs_part = {
 				"Part Name": "CD4046",
 				"Type":		 "Phase-Locked Loop",
+				"Abbr":		 "PLL",
 				"Component": "phase comparators"
 				};
 
