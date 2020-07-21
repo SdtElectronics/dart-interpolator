@@ -65,13 +65,8 @@ class Interpolator{
 	}
 
 	String call<V>(Map<String, V> sub) {
-		//Cast if necessary and make a copy since sub need to be modified 
-		Map<String, String> subCopy;
-		if(V is String){
-			subCopy = Map.from(sub);
-		}else{
-			subCopy = sub.map((key, val) => MapEntry(key, val.toString()));
-		}
+		//Make a copy since sub need to be modified 
+		var subCopy = Map.from(sub);
 
 		//Escape the brackets
 		subCopy["pre"] = _prefix;
@@ -92,10 +87,9 @@ class Interpolator{
 								   					"and no placeholder specified")
 							)
 						)
-					);
+					).toString();
 		}
 		
 		return ret += _bodySegs[index];
 	}
-
 }
