@@ -1,26 +1,33 @@
 import 'exception.dart';
 
+///Class to parse and cache format string for later interpolation
+///
+///
 class Interpolator{
 
 	static const _prefix = "{";
 	static const _suffix = "}";
 
-	final String placeholder;
+	///Placeholder to substitute unmatched keys
+	final String _placeholder;
+	///Cache for parsed format string
 	final List<String> _bodySegs;
+	///Cache for parsed format string
 	final List<String> _subs;
 
-	///Get interpolation keys
+	///Get interpolation keys from format string
 	get keys {
-		List<String> ret = List.from(_subs);
+		Set<String> ret = Set.from(_subs);
+		//Escape characters are not keys
 		while(ret.remove("pre"));
 		while(ret.remove("suf"));
 		return ret;
 	}
 
-	///Get input format string
+	///Get input format string from cache
 	get format {
 		List<String> ret = [_bodySegs[0]];
-
+		//Assemble the format string from segments and keys
 		int index = 0;
 		for(final sub in _subs){
 			ret.addAll(["{${sub}}", _bodySegs[++index]]);
@@ -29,9 +36,12 @@ class Interpolator{
 		return ret.join();
 	}
 
-	Interpolator._(this._bodySegs, this._subs, this.placeholder);
+	Interpolator._(this._bodySegs, this._subs, this._placeholder);
 
-	factory Interpolator(String format, {String placeholder = null}){
+	///Create an Interpolator with [format] and an optional [placeholder].
+	///If [placeholder] is set to null(by default), performing interpolation with a
+	/// map failed to provide all keys in the [format] will throw a [FormatException].
+	factory Interpolator(String format, [String placeholder = null]){
 		//Break the format string into
 		//[segment 0] { [segment 1] { [segment 2] ... { [segment n-1]
 		final segments = "$format".split(_prefix);
@@ -42,9 +52,9 @@ class Interpolator{
 		//Add [segment 0] to body segments
 		bodySegs.add(segments[0] ?? "");
 
-		//Parse interpolations from [segment 1]
+		//Parse interpolations of [segment 1]
 		for(final segPairStr in segments.sublist(1)){
-			//A segPair is like [interpolation] } [trailing string]
+			//A segPair is in the form [interpolation] } [trailing string]
 			final segPair = segPairStr.split(_suffix);
 			
 			//If the '}' matching the previous '{' is missing, throw an Exception
@@ -64,9 +74,10 @@ class Interpolator{
 		return Interpolator._(bodySegs, subs, placeholder);
 	}
 
-	String call<V>(Map<String, V> sub) {
+	///Perform interpolation on early parsed format string with [subs]
+	String call<V>(Map<String, V> subs) {
 		//Make a copy since sub need to be modified 
-		var subCopy = Map.from(sub);
+		var subCopy = Map.from(subs);
 
 		//Escape the brackets
 		subCopy["pre"] = _prefix;
@@ -79,8 +90,12 @@ class Interpolator{
 		for(final unsub in _subs){
 			ret += _bodySegs[index++];
 			ret += (subCopy[unsub] ?? 
-					    (placeholder ?? 
+						//If an interpolation references to a key does not exists
+						//in the provided Map, substitute it with _placeholder
+					    (_placeholder ?? 
 							(
+								//If no laceholder specified
+								//throw an Exception
 								throw FormatException("No match with key \"$unsub\" at " 
 												   "${formatLocation(format, 
 												   					 RegExp(unsub))} "
@@ -91,5 +106,14 @@ class Interpolator{
 		}
 		
 		return ret += _bodySegs[index];
+	}
+
+	///Give useful information when debugging
+	@override
+	String toString(){
+		return "Interpolator: {\n"
+			   "	format: $format,\n"
+			   "	placeholder: ${_placeholder.toString()}\n"
+			   "}";
 	}
 }

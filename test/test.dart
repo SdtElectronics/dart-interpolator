@@ -25,7 +25,7 @@ void main() {
 
 		test("Interpolation on format String with null "
 			 "match and a placeholder provided", () {
-      		final interpolator = Interpolator(format, placeholder: "2");
+      		final interpolator = Interpolator(format, "2");
 			const subs_part = {
 				"Part Name": "CD4046",
 				"Type":		 "Phase-Locked Loop",
@@ -44,7 +44,16 @@ void main() {
 		test("Get interpolation List", () {
       		final interpolator = Interpolator(format);
       		expect(interpolator.keys,
-			  	   equals(subs_full.entries.map((e) => e.key.toString()).toList()));
+			  	   equals(subs_full.entries.map((e) => e.key.toString()).toSet()));
+    	});
+
+		test("toString method", () {
+      		final interpolator = Interpolator(format);
+			const str = "Interpolator: {\n"
+			   			"	format: $format,\n"
+			   			"	placeholder: null\n"
+			   			"}";
+      		expect(interpolator.toString() ,equals(str));
     	});
  	});
 
