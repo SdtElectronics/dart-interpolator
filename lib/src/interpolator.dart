@@ -2,7 +2,14 @@ import 'exception.dart';
 
 ///Class to parse and cache format string for later interpolation
 ///
+///Initialization with a format String:
+///```
+///const format = "substitution: {sub}; escaping braces: {pre}{suf} placeholder:{unmatched}";
+///final interpolator = Interpolator(format, "null");
+///print(interpolator({"sub": "substituted"}));
 ///
+/////substitution: substituted; escaping braces: {} placeholder:null
+///```
 class Interpolator{
 
 	static const _prefix = "{";
@@ -19,8 +26,8 @@ class Interpolator{
 	get keys {
 		Set<String> ret = Set.from(_subs);
 		//Escape characters are not keys
-		while(ret.remove("pre"));
-		while(ret.remove("suf"));
+		ret.remove("pre");
+		ret.remove("suf");
 		return ret;
 	}
 
@@ -79,7 +86,7 @@ class Interpolator{
 		//Make a copy since sub need to be modified 
 		var subCopy = Map.from(subs);
 
-		//Escape the brackets
+		//Escape the braces
 		subCopy["pre"] = _prefix;
 		subCopy["suf"] = _suffix;
 
