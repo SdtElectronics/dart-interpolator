@@ -45,7 +45,7 @@ class Interpolator{
 
 	Interpolator._(this._bodySegs, this._subs, this._placeholder);
 
-	///Create an Interpolator with [format] and an optional [placeholder].
+	///Create an [Interpolator] with [format] and an optional [placeholder].
 	///If [placeholder] is set to null(by default), performing interpolation with a
 	/// map failed to provide all keys in the [format] will throw a [FormatException].
 	factory Interpolator(String format, [String placeholder = null]){
