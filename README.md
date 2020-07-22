@@ -47,7 +47,7 @@ Interpolator("Unmatched '{pre}' at 2:2\n { ");
 
 ```dart
 final nullMatch = Interpolator("{nullMatch}");
-interpolator(const{});
+nullMatch(const{});
 
 ///FormatException: No match with key "nullMatch" at 1:2 and no placeholder specified
 ```
