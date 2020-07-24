@@ -25,7 +25,7 @@ void main() {
 
 		test("Interpolation on format String with null "
 			 "match and a placeholder provided", () {
-      		final interpolator = Interpolator(format, "2");
+      		final interpolator = Interpolator(format, {null: "2"});
 			const subs_part = {
 				"Part Name": "CD4046",
 				"Type":		 "Phase-Locked Loop",
@@ -36,26 +36,46 @@ void main() {
       		expect(interpolator(subs_part) ,equals(result));
     	});
 
+ 	});
+
+	group("Information retrieval", (){
+		const format = "{Part Name} CMOS Micropower {Type} {pre} {Abbr} {suf} consists "
+					   "of a low power linear voltage-controlled"
+					   "oscillator  and {Count} different {Component} ";
+		const result = "CD4046 CMOS Micropower Phase-LockedLoop { PLL } consists"
+					   " of a low power linear voltage-controlled"
+					   "oscillator  and 2 different phasecomparators ";
+		const subs_full = {
+			"Part Name": "CD4046",
+			"Type":		 "Phase-LockedLoop",
+			"Abbr":		 "PLL",
+			"Count":	 "2",
+			"Component": "phasecomparators"
+		};
+		print(Interpolator(format)(subs_full));
+		final interpolator = Interpolator(format);
+
 		test("Get input format String", () {
-      		final interpolator = Interpolator(format);
       		expect(interpolator.format ,equals(format));
     	});
 
 		test("Get interpolation List", () {
-      		final interpolator = Interpolator(format);
       		expect(interpolator.keys,
 			  	   equals(subs_full.entries.map((e) => e.key.toString()).toSet()));
     	});
 
+		test("Retrieve values", () {
+      		expect(interpolator.retrieve(result) ,equals(subs_full));
+    	});
+
 		test("toString method", () {
-      		final interpolator = Interpolator(format);
 			const str = "Interpolator: {\n"
 			   			"	format: $format,\n"
-			   			"	placeholder: null\n"
+			   			"	Default Values: {}\n"
 			   			"}";
       		expect(interpolator.toString() ,equals(str));
     	});
- 	});
+	});
 
 	group('Syntax Error Check:', () {
 		test("Exception handling on format String with "

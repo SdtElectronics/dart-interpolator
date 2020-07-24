@@ -5,7 +5,7 @@ import 'exception.dart';
 ///Initialization with a format String:
 ///```
 ///const format = "substitution: {sub}; escaping braces: {pre}{suf} placeholder:{unmatched}";
-///final interpolator = Interpolator(format, "null");
+///final interpolator = Interpolator(format, {null: "null"});
 ///print(interpolator({"sub": "substituted"}));
 ///
 /////substitution: substituted; escaping braces: {} placeholder:null
@@ -16,7 +16,7 @@ class Interpolator{
 	static const _suffix = "}";
 
 	///Placeholder to substitute unmatched keys
-	final String _placeholder;
+	final Map<String, dynamic> _defaultVal;
 	///Cache for parsed format string
 	final List<String> _bodySegs;
 	///Cache for parsed format string
@@ -43,12 +43,22 @@ class Interpolator{
 		return ret.join();
 	}
 
-	Interpolator._(this._bodySegs, this._subs, this._placeholder);
+	Interpolator._(this._bodySegs, this._subs, this._defaultVal);
 
-	///Create an [Interpolator] with [format] and an optional [placeholder].
-	///If [placeholder] is set to null(by default), performing interpolation with a
-	/// map failed to provide all keys in the [format] will throw a [FormatException].
-	factory Interpolator(String format, [String placeholder = null]){
+	///Create an [Interpolator] with [format] and an optional map [defaultVal] to set
+	///the default values of keys.
+	///Set the value of key [null] in the [defaultVal] to designate a placeholder to 
+	///substitute the keys in the format string which do not exist in the provided map,
+	///otherwise a [FormatException] will be thrown when fail to find a key in the map.
+	factory Interpolator(String format, [Map<String, dynamic> defaultVal = const {}]){
+		//Escape the braces
+		const escapeChar = {"pre": "{", "suf": "}"};
+		return Interpolator.noEscape(format, {}..addAll(escapeChar)..addAll(defaultVal));
+	}
+
+	///All the same to the [Interpolator] constructor except this one crates an
+	///interpolator which does not escape the braces.
+	factory Interpolator.noEscape(String format, [Map<String, dynamic> defaultVal]){
 		//Break the format string into
 		//[segment 0] { [segment 1] { [segment 2] ... { [segment n-1]
 		final segments = "$format".split(_prefix);
@@ -78,17 +88,15 @@ class Interpolator{
 
 		};
 
-		return Interpolator._(bodySegs, subs, placeholder);
+		return Interpolator._(bodySegs, subs, defaultVal);
 	}
 
 	///Perform interpolation on early parsed format string with [subs]
 	String call<V>(Map<String, V> subs) {
-		//Make a copy since sub need to be modified 
-		var subCopy = Map.from(subs);
 
-		//Escape the braces
-		subCopy["pre"] = _prefix;
-		subCopy["suf"] = _suffix;
+		final subCopy = _defaultVal != null						? 
+						({}..addAll(_defaultVal)..addAll(subs)) : 
+						subs;
 
 		String ret = "";
 
@@ -96,18 +104,14 @@ class Interpolator{
 		int index = 0;
 		for(final unsub in _subs){
 			ret += _bodySegs[index++];
-			ret += (subCopy[unsub] ?? 
-						//If an interpolation references to a key does not exists
-						//in the provided Map, substitute it with _placeholder
-					    (_placeholder ?? 
-							(
-								//If no laceholder specified
-								//throw an Exception
-								throw FormatException("No match with key \"$unsub\" at " 
-												   "${formatLocation(format, 
-												   					 RegExp(unsub))} "
-								   					"and no placeholder specified")
-							)
+			ret += (subCopy[unsub] ?? subCopy[null] ??
+						(
+							//If no laceholder specified
+							//throw an Exception
+							throw FormatException("No match with key \"$unsub\" at " 
+											   "${formatLocation(format, 
+											   					 RegExp(unsub))} "
+							   					"and no placeholder specified")
 						)
 					).toString();
 		}
@@ -115,12 +119,37 @@ class Interpolator{
 		return ret += _bodySegs[index];
 	}
 
+	///Retrieve values from an interpolated string [input]
+	///Use with care since values may contain the same patterns that divide values
+	Map<String, String> retrieve(String input){
+		int index = 0;
+		Map<String, String> ret = {};
+		var inputCopy = input.toString();
+		for(final key in _subs){
+			//print("ss${_bodySegs[index]}ss");
+			//print(key);
+			//print("ss${_bodySegs[index + 1]}ss");
+			//print(inputCopy);
+			ret[key] = RegExp("(?<=${_bodySegs[index]}).*?(?=${_bodySegs[index + 1]})")
+					   .firstMatch(inputCopy)?.group(0);
+			inputCopy = inputCopy.replaceFirst(RegExp("${_bodySegs[index]}.*?(?=${_bodySegs[++index]})"), "");
+		}
+		
+		//Escape characters are not keys
+		ret.remove("pre");
+		ret.remove("suf");
+		return ret;
+	}
+
 	///Give useful information when debugging
 	@override
 	String toString(){
+		final defValCopy = Map.from(_defaultVal);
+		defValCopy.remove("pre");
+		defValCopy.remove("suf");
 		return "Interpolator: {\n"
 			   "	format: $format,\n"
-			   "	placeholder: ${_placeholder.toString()}\n"
+			   "	Default Values: ${defValCopy.toString()}\n"
 			   "}";
 	}
 }

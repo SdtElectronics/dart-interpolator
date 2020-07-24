@@ -19,6 +19,7 @@ void main() {
 
 	//Need format string includes '{' and '}'? No problem!
 
+	//TODO: add example for default values
 
 	try{
 		Interpolator("Unmatched '{pre}' at 2:2\n { ");
