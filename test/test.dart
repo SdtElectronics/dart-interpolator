@@ -17,6 +17,13 @@ void main() {
 			"Component": "phase comparators"
 		};
 
+		const subs_part = {
+				"Part Name": "CD4046",
+				"Type":		 "Phase-Locked Loop",
+				"Abbr":		 "PLL",
+				"Component": "phase comparators"
+				};
+
 		test("Interpolation on format String with full "
 			 "match and no placeholder provided", () {
       		final interpolator = Interpolator(format);
@@ -24,15 +31,14 @@ void main() {
     	});
 
 		test("Interpolation on format String with null "
+			 "match and a default value provided", () {
+      		final interpolator = Interpolator(format, {"Count": "2"});
+      		expect(interpolator(subs_part) ,equals(result));
+    	});
+
+		test("Interpolation on format String with null "
 			 "match and a placeholder provided", () {
       		final interpolator = Interpolator(format, {null: "2"});
-			const subs_part = {
-				"Part Name": "CD4046",
-				"Type":		 "Phase-Locked Loop",
-				"Abbr":		 "PLL",
-				"Component": "phase comparators"
-				};
-
       		expect(interpolator(subs_part) ,equals(result));
     	});
 
@@ -52,7 +58,6 @@ void main() {
 			"Count":	 "2",
 			"Component": "phasecomparators"
 		};
-		print(Interpolator(format)(subs_full));
 		final interpolator = Interpolator(format);
 
 		test("Get input format String", () {

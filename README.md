@@ -37,6 +37,16 @@ print(escaped(const {}));
 Note: this only works out of braces contain the keys. Names of keys containing braces are not allowed.
 
 ## Features 
+Default values can be set when initializing an Interpolator. When format string contains keys not provided by the map during interpolation, corresponding default values will be filled. Set the value of key null as a placeholder to fill all unspecified values.
+```dart
+const format = "Default value: {default}, placeholder: {unspecified}";
+const defaultVal = {"default": 0, null: '_'};
+final fillDefault = Interpolator(format, defaultVal);
+print(fillDefault(const {}));
+
+//Default value: 0, placeholder: _
+```
+
 Interpolator can detect and locate syntax errors in format strings, i.e. unclosed brace or a key not provided by the substitution map while no placeholder is specified. This feature makes it preferable when handling format strings you have less control on them, such as user inputs or a configuration file.
 
 ```dart

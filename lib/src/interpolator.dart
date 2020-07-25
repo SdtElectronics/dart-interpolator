@@ -126,15 +126,13 @@ class Interpolator{
 		Map<String, String> ret = {};
 		var inputCopy = input.toString();
 		for(final key in _subs){
-			//print("ss${_bodySegs[index]}ss");
-			//print(key);
-			//print("ss${_bodySegs[index + 1]}ss");
-			//print(inputCopy);
 			ret[key] = RegExp("(?<=${_bodySegs[index]}).*?(?=${_bodySegs[index + 1]})")
 					   .firstMatch(inputCopy)?.group(0);
-			inputCopy = inputCopy.replaceFirst(RegExp("${_bodySegs[index]}.*?(?=${_bodySegs[++index]})"), "");
+			inputCopy = inputCopy.replaceFirst(
+				RegExp("${_bodySegs[index]}.*?(?=${_bodySegs[++index]})"), ""
+			);
 		}
-		
+
 		//Escape characters are not keys
 		ret.remove("pre");
 		ret.remove("suf");

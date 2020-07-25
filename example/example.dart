@@ -19,7 +19,12 @@ void main() {
 
 	//Need format string includes '{' and '}'? No problem!
 
-	//TODO: add example for default values
+	const defaultFormat = "Default value: {default}, placeholder: {unspecified}";
+	const defaultVal = {"default": 0, null: '_'};
+	final fillDefault = Interpolator(defaultFormat, defaultVal);
+	print(fillDefault(const {}));
+
+	//Default value: 0, placeholder: _
 
 	try{
 		Interpolator("Unmatched '{pre}' at 2:2\n { ");
