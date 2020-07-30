@@ -127,10 +127,11 @@ class Interpolator{
 		Map<String, String> ret = {};
 		for(final key in _subs){
 			final prefix = _bodySegs[index];
+			start +=  prefix.length;
 			final val = RegExp("(?<=${prefix}).*?(?=${_bodySegs[++index]})")
-					   .firstMatch(input.substring(start)).group(0);
+					   .matchAsPrefix(input, start).group(0);
 			ret[key] = val;
-			start += (val.length + prefix.length);
+			start += val.length;
 		}
 
 		//Escape characters are not keys
