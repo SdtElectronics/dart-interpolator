@@ -123,14 +123,14 @@ class Interpolator{
 	///Use with care since values may contain the same patterns that divide values
 	Map<String, String> retrieve(String input){
 		int index = 0;
+		int start = 0;
 		Map<String, String> ret = {};
-		var inputCopy = input.toString();
 		for(final key in _subs){
-			ret[key] = RegExp("(?<=${_bodySegs[index]}).*?(?=${_bodySegs[index + 1]})")
-					   .firstMatch(inputCopy)?.group(0);
-			inputCopy = inputCopy.replaceFirst(
-				RegExp("${_bodySegs[index]}.*?(?=${_bodySegs[++index]})"), ""
-			);
+			final prefix = _bodySegs[index];
+			final val = RegExp("(?<=${prefix}).*?(?=${_bodySegs[++index]})")
+					   .firstMatch(input.substring(start)).group(0);
+			ret[key] = val;
+			start += (val.length + prefix.length);
 		}
 
 		//Escape characters are not keys
