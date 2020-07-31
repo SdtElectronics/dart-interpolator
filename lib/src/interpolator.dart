@@ -26,21 +26,21 @@ class Interpolator{
 	get keys {
 		Set<String> ret = Set.from(_subs);
 		//Escape characters are not keys
-		ret.remove("pre");
-		ret.remove("suf");
+		ret..remove("pre")..remove("suf");
 		return ret;
 	}
 
 	///Get input format string from cache
 	get format {
-		List<String> ret = [_bodySegs[0]];
+		final ret = StringBuffer();
 		//Assemble the format string from segments and keys
+		ret.write(_bodySegs[0]);
 		int index = 0;
 		for(final sub in _subs){
-			ret.addAll(["{${sub}}", _bodySegs[++index]]);
+			ret..write("{${sub}}")..write(_bodySegs[++index]);
 		}
 
-		return ret.join();
+		return ret.toString();
 	}
 
 	Interpolator._(this._bodySegs, this._subs, this._defaultVal);
@@ -73,19 +73,17 @@ class Interpolator{
 		for(final segPairStr in segments.sublist(1)){
 			//A segPair is in the form [interpolation] } [trailing string]
 			final segPair = segPairStr.split(_suffix);
-			
-			//If the '}' matching the previous '{' is missing, throw an Exception
-			if(segPair[0].length == segPairStr.length){
+			//Add the interpolation to subs
+			subs.add(segPair[0]);
+			//Add the trailing string to body segments
+			try{
+				bodySegs.add(segPair[1]);
+			}on RangeError{
+				//If the '}' matching the previous '{' is missing, throw an Exception
 				throw FormatException("Expected '$_suffix' to match '$_prefix' at "
 									  "${formatLocation(segPairStr == segments.last?
 									  	'{$format{' : format, '{$segPairStr{')}");
 			}
-
-			//Add the interpolation to subs
-			subs.add(segPair[0]);
-			//Add the trailing string to body segments
-			bodySegs.add(segPair[1]);
-
 		};
 
 		return Interpolator._(bodySegs, subs, defaultVal);
@@ -98,13 +96,13 @@ class Interpolator{
 						({}..addAll(_defaultVal)..addAll(subs)) : 
 						subs;
 
-		String ret = "";
+		final ret = StringBuffer();
 
 		//Assemble the result string from segments and substitutions
 		int index = 0;
 		for(final unsub in _subs){
-			ret += _bodySegs[index++];
-			ret += (subCopy[unsub] ?? subCopy[null] ??
+			ret.write(_bodySegs[index++]);
+			ret.write(subCopy[unsub] ?? subCopy[null] ??
 						(
 							//If no laceholder specified
 							//throw an Exception
@@ -113,10 +111,9 @@ class Interpolator{
 											   					 RegExp(unsub))} "
 							   					"and no placeholder specified")
 						)
-					).toString();
+					);
 		}
-		
-		return ret += _bodySegs[index];
+		return (ret..write(_bodySegs[index])).toString();
 	}
 
 	///Retrieve values from an interpolated string [input]
@@ -135,8 +132,7 @@ class Interpolator{
 		}
 
 		//Escape characters are not keys
-		ret.remove("pre");
-		ret.remove("suf");
+		ret..remove("pre")..remove("suf");
 		return ret;
 	}
 
