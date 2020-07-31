@@ -26,21 +26,19 @@ class Interpolator{
 	get keys {
 		Set<String> ret = Set.from(_subs);
 		//Escape characters are not keys
-		ret..remove("pre")..remove("suf");
-		return ret;
+		return ret..remove("pre")..remove("suf");
 	}
 
 	///Get input format string from cache
 	get format {
 		final ret = StringBuffer();
 		//Assemble the format string from segments and keys
-		ret.write(_bodySegs[0]);
 		int index = 0;
 		for(final sub in _subs){
-			ret..write("{${sub}}")..write(_bodySegs[++index]);
+			ret..write(_bodySegs[index++])..write("{${sub}}");
 		}
 
-		return ret.toString();
+		return (ret..write(_bodySegs[index])).toString();
 	}
 
 	Interpolator._(this._bodySegs, this._subs, this._defaultVal);
@@ -104,7 +102,7 @@ class Interpolator{
 			ret.write(_bodySegs[index++]);
 			ret.write(subCopy[unsub] ?? subCopy[null] ??
 						(
-							//If no laceholder specified
+							//If no placeholder specified
 							//throw an Exception
 							throw FormatException("No match with key \"$unsub\" at " 
 											   "${formatLocation(format, 
@@ -132,11 +130,9 @@ class Interpolator{
 		}
 
 		//Escape characters are not keys
-		ret..remove("pre")..remove("suf");
-		return ret;
+		return ret..remove("pre")..remove("suf");
 	}
 
-	///Give useful information when debugging
 	@override
 	String toString(){
 		final defValCopy = Map.from(_defaultVal);

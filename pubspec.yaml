@@ -1,5 +1,5 @@
 name: interpolator
-version: 0.0.2
+version: 0.0.3
 description: Yet another Dart package to handle dynamic String interpolation with lighter implementation and error check.
 homepage: https://github.com/SdtElectronics/dart-interpolator
 
