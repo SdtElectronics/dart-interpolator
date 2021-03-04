@@ -1,8 +1,8 @@
 import 'exception.dart';
 
-///Class to parse and cache format string for later interpolation
+///Class to parse and cache string template for later interpolation
 ///
-///Initialization with a format String:
+///Initialization with a string template:
 ///```
 ///const format = "substitution: {sub}; escaping braces: {pre}{suf} placeholder:{unmatched}";
 ///final interpolator = Interpolator(format, {null: "null"});
@@ -16,23 +16,23 @@ class Interpolator{
 	static const _suffix = "}";
 
 	///Placeholder to substitute unmatched keys
-	final Map<String, dynamic> _defaultVal;
-	///Cache for parsed format string
+	final Map<String?, dynamic> _defaultVal;
+	///Cache for parsed string template
 	final List<String> _bodySegs;
-	///Cache for parsed format string
+	///Cache for parsed string template
 	final List<String> _subs;
 
-	///Get interpolation keys from format string
+	///Interpolation keys of string template
 	get keys {
 		Set<String> ret = Set.from(_subs);
 		//Escape characters are not keys
 		return ret..remove("pre")..remove("suf");
 	}
 
-	///Get input format string from cache
+	///The input string template 
 	get format {
 		final ret = StringBuffer();
-		//Assemble the format string from segments and keys
+		//Assemble the string template from segments and keys
 		int index = 0;
 		for(final sub in _subs){
 			ret..write(_bodySegs[index++])..write("{${sub}}");
@@ -46,9 +46,9 @@ class Interpolator{
 	///Create an [Interpolator] with [format] and an optional map [defaultVal] to set
 	///the default values of keys.
 	///Set the value of key [null] in the [defaultVal] to designate a placeholder to 
-	///substitute the keys in the format string which do not exist in the provided map,
+	///substitute the keys in the string template which do not exist in the provided map,
 	///otherwise a [FormatException] will be thrown when fail to find a key in the map.
-	factory Interpolator(String format, [Map<String, dynamic> defaultVal = const {}]){
+	factory Interpolator(String format, [Map<String?, dynamic> defaultVal = const {}]){
 		//Escape the braces
 		const escapeChar = {"pre": "{", "suf": "}"};
 		return Interpolator.noEscape(format, {}..addAll(escapeChar)..addAll(defaultVal));
@@ -56,16 +56,22 @@ class Interpolator{
 
 	///All the same to the [Interpolator] constructor except this one crates an
 	///interpolator which does not escape the braces.
-	factory Interpolator.noEscape(String format, [Map<String, dynamic> defaultVal]){
-		//Break the format string into
+	factory Interpolator.noEscape(String format, [Map<String?, dynamic> defaultVal  = const {}]){
+		//Break the string template into
 		//[segment 0] { [segment 1] { [segment 2] ... { [segment n-1]
 		final segments = "$format".split(_prefix);
+
+		//If no '{' presented in the string template 
+		if(segments.length == 1){
+			//Return an Interpolator do noting to the string template 
+			return Interpolator._(<String>[], <String>[], defaultVal);
+		}
 
 		List<String> bodySegs = [];
 		List<String> subs = [];
 
 		//Add [segment 0] to body segments
-		bodySegs.add(segments[0] ?? "");
+		bodySegs.add(segments[0]);
 
 		//Parse interpolations of [segment 1]
 		for(final segPairStr in segments.sublist(1)){
@@ -87,12 +93,10 @@ class Interpolator{
 		return Interpolator._(bodySegs, subs, defaultVal);
 	}
 
-	///Perform interpolation on early parsed format string with [subs]
-	String call<V>(Map<String, V> subs) {
+	///Perform interpolation on early parsed string template with [subs]
+	String call<V>(Map<String?, V> subs) {
 
-		final subCopy = _defaultVal != null						? 
-						({}..addAll(_defaultVal)..addAll(subs)) : 
-						subs;
+		final subCopy = {}..addAll(_defaultVal)..addAll(subs);
 
 		final ret = StringBuffer();
 
@@ -124,8 +128,8 @@ class Interpolator{
 			final prefix = _bodySegs[index];
 			start +=  prefix.length;
 			final val = RegExp("(?<=${prefix}).*?(?=${_bodySegs[++index]})")
-					   .matchAsPrefix(input, start).group(0);
-			ret[key] = val;
+					   .matchAsPrefix(input, start)?.group(0);
+			ret[key] = val ?? (throw FormatException("Corrupted input String"));
 			start += val.length;
 		}
 

@@ -1,10 +1,10 @@
 name: interpolator
 version: 0.0.3
-description: Yet another Dart package to handle dynamic String interpolation with lighter implementation and error check.
+description: Yet another Dart package to handle dynamic String interpolation with better performance and error check.
 homepage: https://github.com/SdtElectronics/dart-interpolator
 
 environment:
-  sdk: '>=2.0.0 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 
 dev_dependencies:
   test: ^1.00.0

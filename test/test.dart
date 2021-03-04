@@ -24,19 +24,19 @@ void main() {
 				"Component": "phase comparators"
 				};
 
-		test("Interpolation on format String with full "
+		test("Interpolation on string template with full "
 			 "match and no placeholder provided", () {
       		final interpolator = Interpolator(format);
       		expect(interpolator(subs_full) ,equals(result));
     	});
 
-		test("Interpolation on format String with null "
+		test("Interpolation on string template with null "
 			 "match and a default value provided", () {
       		final interpolator = Interpolator(format, {"Count": "2"});
       		expect(interpolator(subs_part) ,equals(result));
     	});
 
-		test("Interpolation on format String with null "
+		test("Interpolation on string template with null "
 			 "match and a placeholder provided", () {
       		final interpolator = Interpolator(format, {null: "2"});
       		expect(interpolator(subs_part) ,equals(result));
@@ -60,7 +60,7 @@ void main() {
 		};
 		final interpolator = Interpolator(format);
 
-		test("Get input format String", () {
+		test("Get input string template", () {
       		expect(interpolator.format ,equals(format));
     	});
 
@@ -83,7 +83,7 @@ void main() {
 	});
 
 	group('Syntax Error Check:', () {
-		test("Exception handling on format String with "
+		test("Exception handling on string template with "
 			 "unmatched '{'", () {
 
 			try{
@@ -93,7 +93,7 @@ void main() {
 			}	
     	});
 
-		test("Exception handling on format String with null "
+		test("Exception handling on string template with null "
 			 "match and no placeholder provided", () {
 			const format = "{nullMatch}";
       		final interpolator = Interpolator(format);

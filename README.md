@@ -1,6 +1,6 @@
 # Interpolator
 
-[Interpolator](https://pub.dev/packages/interpolator) is yet another Dart package to handle dynamic String interpolation with lighter implementation and error check.
+[Interpolator](https://pub.dev/packages/interpolator) is yet another Dart package to handle dynamic String interpolation with better performance and error check.
 
 ## Usage
 
@@ -62,7 +62,7 @@ nullMatch(const{});
 ///FormatException: No match with key "nullMatch" at 1:2 and no placeholder specified
 ```
 
-Providing richer functionality, interpolator also has a better performance than the simple function implemented with the [splitMapJoin](https://api.dart.dev/stable/2.8.4/dart-core/String/splitMapJoin.html) method provided by the core library when running as a pre-compiled binary(Tested with dart SDK 2.8.4, WSL 4.4.0-18362 ,[valgrind](https://www.valgrind.org/) and [GNU time](https://www.gnu.org/software/time/)). 
+Providing richer functionality, interpolator also has a better performance than the simple function implemented with the [splitMapJoin](https://api.dart.dev/stable/2.8.4/dart-core/String/splitMapJoin.html) method provided by the core library when running as a pre-compiled binary(Tested with dart SDK 2.8.4, WSL 4.4.0-18362 and [GNU time](https://www.gnu.org/software/time/)). 
 
 ```dart
 String inter(String format, Map<String, dynamic> sub ,{String placeholder = ""}){
