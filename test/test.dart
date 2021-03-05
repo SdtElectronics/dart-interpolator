@@ -42,6 +42,12 @@ void main() {
       		expect(interpolator(subs_part) ,equals(result));
     	});
 
+		test("Interpolation on plain string with no "
+			 "key to be substituted", () {
+      		final interpolator = Interpolator("plain");
+      		expect(interpolator(subs_part) ,equals("plain"));
+    	});
+
  	});
 
 	group("Information retrieval", (){

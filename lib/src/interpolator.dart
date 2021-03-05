@@ -61,12 +61,6 @@ class Interpolator{
 		//[segment 0] { [segment 1] { [segment 2] ... { [segment n-1]
 		final segments = "$format".split(_prefix);
 
-		//If no '{' presented in the string template 
-		if(segments.length == 1){
-			//Return an Interpolator do noting to the string template 
-			return Interpolator._(<String>[], <String>[], defaultVal);
-		}
-
 		List<String> bodySegs = [];
 		List<String> subs = [];
 
